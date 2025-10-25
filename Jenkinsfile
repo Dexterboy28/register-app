@@ -1,34 +1,32 @@
 pipeline {
-    agent any
-
+    agent { label 'Jenkins-Agent' }
     tools {
-        maven "maven3"
-         jdk 'Java17'
+        jdk 'Java17'
+        maven 'Maven3'
     }
-
-    stages {
-        stage("Checkout from SCM") {
-            steps {
-                git branch: 'main', url: 'https://github.com/Dexterboy28/register-app'
-            }
+    stages{
+        stage("Cleanup Workspace"){
+                steps {
+                cleanWs()
+                }
         }
 
-        stage("Build Application") {
-            steps {
-                sh 'mvn clean package -DskipTests'
-            }
+        stage("Checkout from SCM"){
+                steps {
+                    git branch: 'main', credentialsId: 'github', url: 'https://github.com/Ashfaque-9x/register-app'
+                }
         }
 
-        stage("Test Application") {
+        stage("Build Application"){
             steps {
-                sh 'mvn test'
+                sh "mvn clean package"
             }
-        }
+
+       }
+
+       stage("Test Application"){
+           steps {
+                 sh "mvn test"
+           }
+       }
     }
-
-    post {
-        always {
-            echo "Pipeline execution complete."
-        }
-    }
-}
